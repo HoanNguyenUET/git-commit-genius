@@ -7,6 +7,7 @@ const i18n = require('../locales/language-manager');
 const conventionalCommits = require('../utils/conventional-commits');
 const hookManager = require('../hooks/hook-manager');
 const { colors, indicators, createBox, gradient, chalk } = require('../utils/colors');
+const editor = require('../utils/editor');
 
 /**
  * Register the generate command with the CLI program
@@ -27,6 +28,9 @@ function registerCommand(program) {
     .option('--hook', 'Run in hook mode for git hooks integration')
     .action(async (options) => {
       try {
+        // Setup editor environment
+        editor.setupEditor();
+        
         // Get user configuration
         const userConfig = config.getConfig();
         
@@ -196,30 +200,45 @@ function registerCommand(program) {
             hookManager.completeHook(true, commitMessage);
           }
         } else if (action === 'edit') {
-          const { editedMessage } = await inquirer.prompt([
-            {
-              type: 'editor',
-              name: 'editedMessage',
-              message: language === 'vi' ? colors.info('Chỉnh sửa commit message:') : colors.info('Edit the commit message:'),
-              default: commitMessage
-            }
-          ]);
+          const availableEditor = editor.getDefaultEditor();
           
-          if (editedMessage.trim()) {
-            git.commit(editedMessage);
-            console.log(`${indicators.rocket} ${colors.success('Changes committed successfully with edited message!')}`);
-            
-            // If running as a hook, tell the hook manager the commit was successful
-            if (options.hook) {
-              hookManager.completeHook(true, editedMessage);
+          if (availableEditor) {
+            try {
+              const { editedMessage } = await inquirer.prompt([
+                {
+                  type: 'editor',
+                  name: 'editedMessage',
+                  message: language === 'vi' ? colors.info('Chỉnh sửa commit message:') : colors.info('Edit the commit message:'),
+                  default: commitMessage
+                }
+              ]);
+              
+              if (editedMessage.trim()) {
+                git.commit(editedMessage);
+                console.log(`${indicators.rocket} ${colors.success(language === 'vi' ? 'Commit thành công với message đã chỉnh sửa!' : 'Changes committed successfully with edited message!')}`);
+                
+                // If running as a hook, tell the hook manager the commit was successful
+                if (options.hook) {
+                  hookManager.completeHook(true, editedMessage);
+                }
+              } else {
+                console.log(`${indicators.warning} ${colors.warning(language === 'vi' ? 'Commit đã hủy: Message trống' : 'Commit cancelled: Empty commit message')}`);
+                
+                // If running as a hook, tell the hook manager the commit was cancelled
+                if (options.hook) {
+                  hookManager.completeHook(false);
+                }
+              }
+            } catch (error) {
+              console.error(`${indicators.error} ${colors.error(language === 'vi' ? 'Lỗi khi mở editor:' : 'Error opening editor:')} ${error.message}`);
+              
+              // Fallback to input prompt
+              await handleEditFallback(commitMessage, language, options, hookManager, git);
             }
           } else {
-            console.log(`${indicators.warning} ${colors.warning('Commit cancelled: Empty commit message')}`);
-            
-            // If running as a hook, tell the hook manager the commit was cancelled
-            if (options.hook) {
-              hookManager.completeHook(false);
-            }
+            // No editor available, use input fallback
+            console.log(`${indicators.warning} ${colors.warning(language === 'vi' ? 'Không tìm thấy text editor. Sử dụng input thay thế:' : 'No text editor found. Using input fallback:')}`);
+            await handleEditFallback(commitMessage, language, options, hookManager, git);
           }
         } else if (action === 'regenerate') {
           // Re-run the command with the same options
@@ -249,6 +268,42 @@ function registerCommand(program) {
         process.exit(1);
       }
     });
+}
+
+/**
+ * Handle fallback input when editor is not available
+ * @param {string} commitMessage - Original commit message
+ * @param {string} language - User language
+ * @param {object} options - Command options
+ * @param {object} hookManager - Hook manager instance
+ * @param {object} git - Git utility instance
+ */
+async function handleEditFallback(commitMessage, language, options, hookManager, git) {
+  const { editedMessage } = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'editedMessage',
+      message: language === 'vi' ? 'Nhập commit message:' : 'Enter commit message:',
+      default: commitMessage
+    }
+  ]);
+  
+  if (editedMessage.trim()) {
+    git.commit(editedMessage);
+    console.log(`${indicators.rocket} ${colors.success(language === 'vi' ? 'Commit thành công với message đã chỉnh sửa!' : 'Changes committed successfully with edited message!')}`);
+    
+    // If running as a hook, tell the hook manager the commit was successful
+    if (options.hook) {
+      hookManager.completeHook(true, editedMessage);
+    }
+  } else {
+    console.log(`${indicators.warning} ${colors.warning(language === 'vi' ? 'Commit đã hủy: Message trống' : 'Commit cancelled: Empty commit message')}`);
+    
+    // If running as a hook, tell the hook manager the commit was cancelled
+    if (options.hook) {
+      hookManager.completeHook(false);
+    }
+  }
 }
 
 module.exports = registerCommand;

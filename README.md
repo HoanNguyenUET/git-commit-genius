@@ -45,7 +45,26 @@ npm link
 npm install -g git-commit-genius
 ```
 
+### Web Interface Setup
+
+Git Commit Genius also includes a web interface for easier interaction:
+
+```bash
+# Navigate to the web directory
+cd web
+
+# Install web dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The web interface will be available at `http://localhost:5173`
+
 ## Usage
+
+### Command Line Interface
 
 ```bash
 # Basic usage - generates a commit message for staged changes
@@ -70,6 +89,37 @@ git-commit-genius generate --conventional
 # Generate commit message in Vietnamese
 git-commit-genius generate --language vi
 ```
+
+### Web Interface
+
+The web interface provides an intuitive way to generate commit messages:
+
+1. **Start the web server**:
+   ```bash
+   cd web
+   npm run dev
+   ```
+
+2. **Open your browser** and navigate to `http://localhost:5173`
+
+3. **Use the interface**:
+   - Paste your git diff in the text area
+   - Select your preferred model (llama2, codellama, mistral)
+   - Adjust temperature for creativity (0.0-1.0)
+   - Enable "Conventional Commits" for standardized format
+   - Click "Generate Commit Message"
+
+4. **Review and copy** the generated message for your commit
+
+#### Web Interface Features
+
+- 🖥️ **User-friendly UI**: Clean and intuitive interface
+- 🔄 **Real-time generation**: Instant commit message generation
+- 📊 **Model selection**: Choose from available Ollama models
+- ⚙️ **Temperature control**: Fine-tune creativity level
+- 📝 **Conventional commits**: Toggle standardized format
+- 🚨 **Error handling**: Clear error messages and status indicators
+- 📋 **Easy copy**: One-click copy generated messages
 
 ## Options
 
@@ -106,12 +156,23 @@ git-commit-genius generate --language vi
 
 Git Commit Genius is designed to fit seamlessly into your development workflow:
 
+### CLI Workflow
 1. Make your code changes
 2. Stage the changes using `git add`
 3. Run `git-commit-genius generate`
 4. Review the generated commit message
 5. Optionally edit the message
 6. Commit your changes
+
+### Web Interface Workflow
+1. Make your code changes and stage them with `git add`
+2. Get the diff using `git diff --staged`
+3. Start the web interface with `cd web && npm run dev`
+4. Open `http://localhost:5173` in your browser
+5. Paste the diff into the text area
+6. Configure your preferences (model, temperature, conventional commits)
+7. Generate and copy the commit message
+8. Use the generated message with `git commit -m "your-message"`
 
 ## Project Structure
 
