@@ -173,6 +173,4 @@ This file manages the multilingual system:
 - `get(key, args, language)`: Get a translated string by key and language
 - `getAvailableLanguages()`: Get a list of available languages
 
-## License
 
-ISC

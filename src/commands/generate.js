@@ -128,12 +128,12 @@ function registerCommand(program) {
           {
             type: 'list',
             name: 'action',
-            message: 'What would you like to do?',
+            message: language === 'vi' ? i18n.get('messages.actionPrompt', [], language) : 'What would you like to do?',
             choices: [
-              { name: 'Use this message and commit', value: 'commit' },
-              { name: 'Edit the message before committing', value: 'edit' },
-              { name: 'Generate another message', value: 'regenerate' },
-              { name: 'Cancel', value: 'cancel' }
+              { name: language === 'vi' ? i18n.get('messages.useAndCommit', [], language) : 'Use this message and commit', value: 'commit' },
+              { name: language === 'vi' ? i18n.get('messages.editBeforeCommit', [], language) : 'Edit the message before committing', value: 'edit' },
+              { name: language === 'vi' ? i18n.get('messages.generateAnother', [], language) : 'Generate another message', value: 'regenerate' },
+              { name: language === 'vi' ? i18n.get('messages.cancel', [], language) : 'Cancel', value: 'cancel' }
             ]
           }
         ]);

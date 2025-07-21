@@ -45,16 +45,16 @@ async function generateCommitMessage(diff, model = 'llama2', temperature = 0.7, 
   // Language-specific prompts
   const languagePrompts = {
     en: {
-      intro: 'You are a senior software engineer tasked with writing high-quality git commit messages.',
-      instructions: '- Start with a short summary line (max 50 chars) that completes the sentence "If applied, this commit will..."\n- Use imperative mood (e.g., "Add", "Fix", "Update")\n- Optionally include a more detailed description after the summary, with line breaks at 72 chars\n- Focus on WHY and WHAT, not HOW\n- Reference issue numbers if relevant',
-      conventionalFormat: 'Use the Conventional Commits format: type(scope): description\nTypes: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nChoose the most appropriate type based on the changes.',
-      ending: 'Respond ONLY with the commit message, nothing else.'
+      intro: 'You are a senior software engineer tasked with writing concise git commit messages.',
+      instructions: '- Keep commit messages extremely short (max 30 chars preferred, never more than 50)\n- Use imperative mood (e.g., "Add", "Fix", "Update")\n- No additional description needed\n- Focus only on the primary change',
+      conventionalFormat: 'Use the Conventional Commits format: type(scope): description\nTypes: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nBe extremely brief.',
+      ending: 'Respond ONLY with the commit message, nothing else. Be short and concise.'
     },
     vi: {
-      intro: 'Bạn là một kỹ sư phần mềm senior có nhiệm vụ viết các thông điệp commit git chất lượng cao.',
-      instructions: '- Bắt đầu bằng một dòng tóm tắt ngắn (tối đa 50 ký tự) hoàn thành câu "Nếu áp dụng, commit này sẽ..."\n- Sử dụng thì mệnh lệnh (ví dụ: "Thêm", "Sửa", "Cập nhật")\n- Tùy chọn thêm mô tả chi tiết hơn sau phần tóm tắt, với ngắt dòng ở ký tự thứ 72\n- Tập trung vào TẠI SAO và CÁI GÌ, không phải LÀM THẾ NÀO\n- Tham chiếu số issue nếu có liên quan',
-      conventionalFormat: 'Sử dụng định dạng Conventional Commits: type(scope): description\nCác loại: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nChọn loại phù hợp nhất dựa trên các thay đổi.',
-      ending: 'Chỉ trả lời với thông điệp commit, không có gì khác.'
+      intro: 'Bạn là một kỹ sư phần mềm viết các thông điệp commit git ngắn gọn bằng tiếng Việt.',
+      instructions: '- Viết thông điệp commit cực kỳ ngắn gọn (tốt nhất là 30 ký tự, không bao giờ quá 50)\n- Sử dụng động từ mệnh lệnh tiếng Việt (ví dụ: "Thêm", "Sửa", "Cập nhật")\n- Không cần thêm mô tả chi tiết\n- Chỉ tập trung vào thay đổi chính',
+      conventionalFormat: 'Sử dụng định dạng Conventional Commits: type(scope): mô tả ngắn bằng tiếng Việt\nCác loại: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nViết cực kỳ ngắn gọn.',
+      ending: 'Chỉ trả lời bằng thông điệp commit, không gì khác. Ngắn gọn và súc tích.'
     }
   };
 
@@ -65,11 +65,18 @@ async function generateCommitMessage(diff, model = 'llama2', temperature = 0.7, 
   const config = require('../config/config').getConfig();
   const useConventional = config.format.useConventionalCommits;
 
-  const prompt = `
-${promptText.intro}
-Based on the following git diff, create a concise and informative commit message following best practices:
+  const promptIntro = language === 'vi' ? 
+  `${promptText.intro}
+Dựa vào git diff sau đây, hãy tạo một thông điệp commit CỰC KỲ ngắn gọn (dưới 30 ký tự nếu có thể) bằng tiếng Việt:` : 
+  `${promptText.intro}
+Based on the following git diff, create an EXTREMELY concise commit message (under 30 chars if possible):`;
+
+const prompt = `
+${promptIntro}
 ${promptText.instructions}
 ${useConventional ? `\n${promptText.conventionalFormat}` : ''}
+
+IMPORTANT: KEEP YOUR RESPONSE EXTREMELY SHORT! Aim for less than 30 characters in the description part.
 
 Git diff:
 \`\`\`
@@ -77,6 +84,7 @@ ${diff}
 \`\`\`
 
 ${promptText.ending}
+REMEMBER: BE EXTREMELY CONCISE!
 `;
 
   try {
