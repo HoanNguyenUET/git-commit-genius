@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { OllamaService } from '../utils/ollama';
+import { formatCommitMessage, determineCommitType } from '../utils/conventional-commits';
 
 const CommitMessageGenerator = () => {
   const [diff, setDiff] = useState<string>('');
@@ -12,26 +13,27 @@ const CommitMessageGenerator = () => {
   const [ollamaAvailable, setOllamaAvailable] = useState<boolean>(false);
   const [models, setModels] = useState<string[]>([]);
 
-  useEffect(() => {
-    checkOllamaStatus();
-  }, []);
-
-  const checkOllamaStatus = async () => {
+  const checkOllamaStatus = useCallback(async () => {
     try {
       const available = await OllamaService.isAvailable();
       setOllamaAvailable(available);
       
       if (available) {
-        const availableModels = await OllamaService.getAvailableModels();
-        setModels(availableModels);
-        if (availableModels.length > 0 && !availableModels.includes(model)) {
-          setModel(availableModels[0]);
-        }
+        // Use default models for now
+        setModels(['llama2', 'codellama', 'mistral']);
+      } else {
+        setModels([]);
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Error checking Ollama status:', error);
       setOllamaAvailable(false);
+      setModels([]);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    checkOllamaStatus();
+  }, [checkOllamaStatus]);
 
   const handleGenerateCommitMessage = async () => {
     if (!diff.trim()) {
@@ -44,12 +46,19 @@ const CommitMessageGenerator = () => {
     setCommitMessage('');
 
     try {
-      const message = await OllamaService.generateCommitMessage({
+      let message = await OllamaService.generateCommitMessage({
         diff,
         conventional,
         model,
         temperature
       });
+      
+      // Apply conventional commit format if enabled
+      if (conventional) {
+        const commitType = determineCommitType(diff);
+        message = formatCommitMessage(message, commitType);
+      }
+      
       setCommitMessage(message);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
