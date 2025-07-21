@@ -1,0 +1,24 @@
+{
+  "name": "git-commit-genius",
+  "version": "1.0.0",
+  "description": "Generate high-quality commit messages using AI and git diff",
+  "main": "index.js",
+  "bin": {
+    "git-commit-genius": "./bin/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bin/index.js"
+  },
+  "keywords": ["git", "commit", "ai", "ollama", "cli"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "chalk": "^4.1.2",
+    "commander": "^14.0.0",
+    "inquirer": "^8.2.5",
+    "ora": "^5.4.1"
+  }
+}

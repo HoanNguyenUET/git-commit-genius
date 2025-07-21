@@ -1,0 +1,78 @@
+{
+  "appName": "Git Commit Genius",
+  "commands": {
+    "generate": {
+      "description": "Generar un mensaje de commit basado en los cambios preparados",
+      "options": {
+        "model": "Modelo de Ollama a utilizar",
+        "temperature": "Temperatura para la generación (0.0-1.0)",
+        "commit": "Confirmar automáticamente con el mensaje generado",
+        "preview": "Solo previsualizar los cambios sin generar un mensaje",
+        "conventional": "Usar formato de commit convencional",
+        "language": "Idioma para el mensaje de commit"
+      }
+    },
+    "config": {
+      "description": "Administrar la configuración",
+      "options": {
+        "set": "Establecer un valor de configuración",
+        "get": "Obtener un valor de configuración",
+        "reset": "Restablecer la configuración a los valores predeterminados"
+      }
+    },
+    "hook": {
+      "description": "Administrar la integración con los hooks de Git",
+      "options": {
+        "install": "Instalar hooks de Git",
+        "uninstall": "Desinstalar hooks de Git"
+      }
+    }
+  },
+  "messages": {
+    "stagedFiles": "Archivos preparados:",
+    "noStagedChanges": "No se encontraron cambios preparados. Use git add para preparar sus cambios.",
+    "notGitRepository": "Error: No está en un repositorio git",
+    "checkingOllama": "Verificando disponibilidad de Ollama...",
+    "ollamaNotAvailable": "Ollama no está disponible. Asegúrese de que está en ejecución.",
+    "ollamaAvailable": "Ollama está disponible",
+    "generatingCommitMessage": "Generando mensaje de commit con el modelo %s...",
+    "generatedCommitMessage": "Mensaje de commit generado",
+    "committedSuccessfully": "¡Cambios confirmados con éxito!",
+    "committedWithEditedMessage": "¡Cambios confirmados con éxito con el mensaje editado!",
+    "commitCancelled": "Commit cancelado",
+    "emptyCommitMessage": "Commit cancelado: Mensaje de commit vacío",
+    "noModelsFound": "No se encontraron modelos en Ollama. Por favor, instale al menos un modelo con:",
+    "modelSuggestion": "ollama pull llama2 u otro modelo de su elección",
+    "conventionalCommitPrompt": "Seleccione el tipo de commit:",
+    "scopePrompt": "Introduzca el ámbito (opcional):",
+    "installingHooks": "Instalando hooks de Git...",
+    "hooksInstalled": "¡Hooks de Git instalados con éxito!",
+    "hooksUninstalled": "¡Hooks de Git desinstalados con éxito!",
+    "uninstallingHooks": "Desinstalando hooks de Git...",
+    "errorInstallingHooks": "Error al instalar hooks de Git: %s",
+    "errorUninstallingHooks": "Error al desinstalar hooks de Git: %s",
+    "configUpdated": "¡Configuración actualizada con éxito!",
+    "configReset": "Configuración restablecida a los valores predeterminados.",
+    "configValue": "Valor actual de '%s': %s"
+  },
+  "prompts": {
+    "action": "¿Qué le gustaría hacer?",
+    "actions": {
+      "useMessage": "Usar este mensaje y confirmar",
+      "editMessage": "Editar el mensaje antes de confirmar",
+      "regenerateMessage": "Generar otro mensaje",
+      "cancel": "Cancelar"
+    },
+    "editMessage": "Editar el mensaje de commit:"
+  },
+  "errors": {
+    "failedToGetStagedDiff": "Error al obtener los cambios preparados: %s",
+    "failedToGetStagedFiles": "Error al obtener los archivos preparados: %s",
+    "failedToCommit": "Error al confirmar: %s",
+    "ollamaApiError": "Error de API de Ollama: %s",
+    "ollamaNoResponse": "No hay respuesta de la API de Ollama. Asegúrese de que Ollama está en ejecución.",
+    "ollamaSetupError": "Error al configurar la solicitud: %s",
+    "failedToGetModels": "Error al obtener los modelos disponibles de Ollama",
+    "noDiffProvided": "No se proporcionaron cambios"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "appName": "Git Commit Genius",
+  "commands": {
+    "generate": {
+      "description": "Generate a commit message based on staged changes",
+      "options": {
+        "model": "Ollama model to use",
+        "temperature": "Temperature for generation (0.0-1.0)",
+        "commit": "Automatically commit with the generated message",
+        "preview": "Just preview the diff without generating a message",
+        "conventional": "Use conventional commit format",
+        "language": "Language for the commit message"
+      }
+    },
+    "config": {
+      "description": "Manage configuration settings",
+      "options": {
+        "set": "Set a configuration value",
+        "get": "Get a configuration value",
+        "reset": "Reset configuration to default"
+      }
+    },
+    "hook": {
+      "description": "Manage Git hooks integration",
+      "options": {
+        "install": "Install Git hooks",
+        "uninstall": "Uninstall Git hooks"
+      }
+    }
+  },
+  "messages": {
+    "stagedFiles": "Staged files:",
+    "noStagedChanges": "No staged changes found. Use git add to stage your changes.",
+    "notGitRepository": "Error: Not in a git repository",
+    "checkingOllama": "Checking Ollama availability...",
+    "ollamaNotAvailable": "Ollama is not available. Make sure it's running.",
+    "ollamaAvailable": "Ollama is available",
+    "generatingCommitMessage": "Generating commit message with %s model...",
+    "generatedCommitMessage": "Generated commit message",
+    "committedSuccessfully": "Changes committed successfully!",
+    "committedWithEditedMessage": "Changes committed successfully with edited message!",
+    "commitCancelled": "Commit cancelled",
+    "emptyCommitMessage": "Commit cancelled: Empty commit message",
+    "noModelsFound": "No models found in Ollama. Please install at least one model with:",
+    "modelSuggestion": "ollama pull llama2 or another model of your choice",
+    "conventionalCommitPrompt": "Select commit type:",
+    "scopePrompt": "Enter scope (optional):",
+    "installingHooks": "Installing Git hooks...",
+    "hooksInstalled": "Git hooks installed successfully!",
+    "hooksUninstalled": "Git hooks uninstalled successfully!",
+    "uninstallingHooks": "Uninstalling Git hooks...",
+    "errorInstallingHooks": "Error installing Git hooks: %s",
+    "errorUninstallingHooks": "Error uninstalling Git hooks: %s",
+    "configUpdated": "Configuration updated successfully!",
+    "configReset": "Configuration reset to default values.",
+    "configValue": "Current value of '%s': %s"
+  },
+  "prompts": {
+    "action": "What would you like to do?",
+    "actions": {
+      "useMessage": "Use this message and commit",
+      "editMessage": "Edit the message before committing",
+      "regenerateMessage": "Generate another message",
+      "cancel": "Cancel"
+    },
+    "editMessage": "Edit the commit message:"
+  },
+  "errors": {
+    "failedToGetStagedDiff": "Failed to get staged diff: %s",
+    "failedToGetStagedFiles": "Failed to get staged files: %s",
+    "failedToCommit": "Failed to commit: %s",
+    "ollamaApiError": "Ollama API error: %s",
+    "ollamaNoResponse": "No response from Ollama API. Make sure Ollama is running.",
+    "ollamaSetupError": "Error setting up request: %s",
+    "failedToGetModels": "Failed to get available models from Ollama",
+    "noDiffProvided": "No diff provided"
+  }
+}
