@@ -53,7 +53,7 @@ async function generateCommitMessage(diff, model = 'llama2', temperature = 0.7, 
     },
     vi: {
       intro: 'Bạn là một kỹ sư phần mềm viết thông điệp commit git ngắn gọn.',
-      instructions: '- Viết thông điệp commit ngắn gọn (tối đa 50 ký tự)\n- Sử dụng động từ mệnh lệnh tiếng Việt (ví dụ: "Thêm", "Sửa", "Cập nhật")\n- Không thêm tiền tố như "Commit:" hay text giải thích\n- Chỉ tập trung vào thay đổi chính\n- Không thêm mô tả dài',
+      instructions: '- Viết thông điệp commit ngắn gọn (tối đa 10 ký tự)\n- Sử dụng động từ mệnh lệnh tiếng Việt (ví dụ: "Thêm", "Sửa", "Cập nhật")\n- Không thêm tiền tố như "Commit:" hay text giải thích\n- Chỉ tập trung vào thay đổi chính\n- Không thêm mô tả dài',
       conventionalFormat: 'Sử dụng định dạng Conventional Commits: type(scope): mô tả ngắn bằng tiếng Việt\nCác loại: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nGiữ phần mô tả ngắn gọn.',
       ending: 'CHỈ trả lời bằng thông điệp commit thôi, không thêm gì khác. Không có text giải thích, không có tiền tố.'
     }
@@ -67,18 +67,31 @@ async function generateCommitMessage(diff, model = 'llama2', temperature = 0.7, 
   const shouldUseConventional = config.format.useConventionalCommits && !skipConventionalFormat;
 
   const promptIntro = language === 'vi' ? 
-  `Tạo thông điệp commit NGẮN GỌN (tối đa 10 từ) bằng tiếng Việt cho git diff này:` : 
-  `Create a SHORT commit message (max 10 words) for this git diff:`;
-
-const prompt = `${promptIntro}
-
+  `Git diff:
 ${diff}
 
-${language === 'vi' ? 
-'VÍ DỤ: "Thêm function test", "Sửa lỗi auth", "Cập nhật README"' : 
-'EXAMPLES: "Add test function", "Fix auth bug", "Update README"'}
+Tạo commit message bằng tiếng Việt (chỉ 3-5 từ):` : 
+  `Git diff:
+${diff}
 
-${language === 'vi' ? 'CHỈ trả lời commit message, KHÔNG giải thích:' : 'ONLY respond with commit message, NO explanation:'}`;
+Create commit message (max 10 words):`;
+
+const prompt = language === 'vi' ? 
+`${promptIntro}
+
+Ví dụ đúng: "Thêm test function", "Sửa lỗi auth", "Cập nhật README"
+KHÔNG viết: "Đây là commit message" hoặc giải thích dài
+
+Trả lời:` :
+`Git diff:
+${diff}
+
+Create SHORT English commit message (3-5 words):
+
+Examples: "Add test function", "Fix auth bug", "Update README", "Remove unused code"
+DO NOT write: "Here is", "The commit message", explanations
+
+Answer:`;
 
   try {
     const response = await axios.post('http://localhost:11434/api/generate', {
@@ -112,19 +125,46 @@ ${language === 'vi' ? 'CHỈ trả lời commit message, KHÔNG giải thích:' 
  * @returns {string} - The cleaned commit message
  */
 function cleanCommitMessage(message) {
-  // Remove common unwanted prefixes and suffixes
+  // Remove common unwanted prefixes and suffixes (English & Vietnamese)
   let cleaned = message
-    .replace(/^(commit message:|commit:|message:)/i, '')
-    .replace(/^(here is|this is|the commit message is)/i, '')
+    .replace(/^(commit message:|commit:|message:|here is|this is|the commit message is)/i, '')
+    .replace(/^(đây là|thông điệp commit|commit message|here are \d+ possible|dưới đây là)/i, '')
+    .replace(/^(for the changes?|cho những thay đổi|for this diff|a possible|diff result)/i, '')
+    .replace(/^(trả lời:|answer:|response:|result:)/i, '')
+    .replace(/^(based on|dựa trên|according to)/i, '')
     .replace(/\.$/, '') // Remove trailing period
+    .replace(/"/g, '') // Remove quotes
     .trim();
   
   // Take only the first line if multiple lines
   cleaned = cleaned.split('\n')[0].trim();
   
-  // Limit to reasonable length (50 chars)
+  // Remove numbered lists (1., 2., etc.)
+  cleaned = cleaned.replace(/^\d+\.\s*/, '');
+  
+  // Remove bullet points
+  cleaned = cleaned.replace(/^[-•*]\s*/, '');
+  
+  // Remove common English words that appear at the start
+  cleaned = cleaned.replace(/^(the |a |an |that |which |what |how |when |where )/i, '');
+  
+  // Remove colons at the end of short phrases
+  cleaned = cleaned.replace(/:$/, '');
+  
+  // If starts with lowercase, capitalize first letter
+  if (cleaned.length > 0) {
+    cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  }
+  
+  // If still too long, take first meaningful part
   if (cleaned.length > 50) {
-    cleaned = cleaned.substring(0, 47) + '...';
+    // Try to find first sentence or phrase
+    const parts = cleaned.split(/[.,:;]/);
+    if (parts[0] && parts[0].length <= 50) {
+      cleaned = parts[0].trim();
+    } else {
+      cleaned = cleaned.substring(0, 47) + '...';
+    }
   }
   
   return cleaned;

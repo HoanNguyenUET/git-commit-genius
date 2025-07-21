@@ -75,9 +75,10 @@ function registerCommand(program) {
         spinner.succeed(`${indicators.success} ${colors.success(i18n.get('messages.ollamaAvailable', [], language))}`);
         
         // Check for available models
+        let availableModels = [];
         try {
-          const models = await ollama.getAvailableModels();
-          if (models.length === 0) {
+          availableModels = await ollama.getAvailableModels();
+          if (availableModels.length === 0) {
             console.error(`${indicators.error} ${colors.error(i18n.get('messages.noModelsFound', [], language))}`);
             console.error(`  ${colors.code('ollama pull llama2')} ${colors.secondary('or another model of your choice')}`);
             return;
@@ -87,8 +88,16 @@ function registerCommand(program) {
           return;
         }
 
-        // Determine which model to use
-        const model = options.model || userConfig.model.defaultModel;
+        // Determine which model to use - check if configured model is available
+        let model = options.model || userConfig.model.defaultModel;
+        if (!availableModels.includes(model)) {
+          console.log(`${indicators.warning} ${colors.warning(`Model '${model}' not found. Available models:`)}`);
+          availableModels.forEach(m => console.log(`  ${indicators.bullet} ${colors.accent(m)}`));
+          
+          // Use the first available model
+          model = availableModels[0];
+          console.log(`${indicators.info} ${colors.info(`Using '${model}' instead.`)}`);
+        }
         
         // Generate commit message
         const generateSpinner = ora({
@@ -139,8 +148,25 @@ function registerCommand(program) {
           {
             type: 'list',
             name: 'action',
-            message: colors.info('What would you like to do?'),
-            choices: [
+            message: language === 'vi' ? colors.info('Bạn muốn làm gì?') : colors.info('What would you like to do?'),
+            choices: language === 'vi' ? [
+              { 
+                name: `${indicators.check} ${colors.success('Sử dụng message này và commit')}`, 
+                value: 'commit' 
+              },
+              { 
+                name: `${indicators.gear} ${colors.warning('Chỉnh sửa message trước khi commit')}`, 
+                value: 'edit' 
+              },
+              { 
+                name: `${indicators.loading} ${colors.info('Tạo message khác')}`, 
+                value: 'regenerate' 
+              },
+              { 
+                name: `${indicators.cross} ${colors.error('Hủy bỏ')}`, 
+                value: 'cancel' 
+              }
+            ] : [
               { 
                 name: `${indicators.check} ${colors.success('Use this message and commit')}`, 
                 value: 'commit' 
@@ -174,7 +200,7 @@ function registerCommand(program) {
             {
               type: 'editor',
               name: 'editedMessage',
-              message: colors.info('Edit the commit message:'),
+              message: language === 'vi' ? colors.info('Chỉnh sửa commit message:') : colors.info('Edit the commit message:'),
               default: commitMessage
             }
           ]);
