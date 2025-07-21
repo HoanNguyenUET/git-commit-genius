@@ -67,6 +67,12 @@ async function generateCommitMessage(diff, model = 'llama2', temperature = 0.7, 
       instructions: '- Beginnen Sie mit einer kurzen Zusammenfassung (max. 50 Zeichen), die den Satz "Wenn angewendet, wird dieser Commit..." vervollständigt\n- Verwenden Sie den Imperativ (z.B. "Hinzufügen", "Beheben", "Aktualisieren")\n- Fügen Sie optional eine detailliertere Beschreibung nach der Zusammenfassung hinzu, mit Zeilenumbrüchen bei 72 Zeichen\n- Konzentrieren Sie sich auf WARUM und WAS, nicht auf WIE\n- Referenzieren Sie Issue-Nummern, falls relevant',
       conventionalFormat: 'Verwenden Sie das Conventional Commits Format: Typ(Umfang): Beschreibung\nTypen: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nWählen Sie den passendsten Typ basierend auf den Änderungen.',
       ending: 'Antworten Sie NUR mit der Commit-Nachricht, nichts anderes.'
+    },
+    vi: {
+      intro: 'Bạn là một kỹ sư phần mềm senior có nhiệm vụ viết các thông điệp commit git chất lượng cao.',
+      instructions: '- Bắt đầu bằng một dòng tóm tắt ngắn (tối đa 50 ký tự) hoàn thành câu "Nếu áp dụng, commit này sẽ..."\n- Sử dụng thì mệnh lệnh (ví dụ: "Thêm", "Sửa", "Cập nhật")\n- Tùy chọn thêm mô tả chi tiết hơn sau phần tóm tắt, với ngắt dòng ở ký tự thứ 72\n- Tập trung vào TẠI SAO và CÁI GÌ, không phải LÀM THẾ NÀO\n- Tham chiếu số issue nếu có liên quan',
+      conventionalFormat: 'Sử dụng định dạng Conventional Commits: type(scope): description\nCác loại: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nChọn loại phù hợp nhất dựa trên các thay đổi.',
+      ending: 'Chỉ trả lời với thông điệp commit, không có gì khác.'
     }
   };
 

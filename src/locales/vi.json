@@ -1,0 +1,60 @@
+{
+  "appName": "Git Commit Genius",
+  "commands": {
+    "generate": {
+      "description": "Tạo thông điệp commit dựa trên các thay đổi đã staged",
+      "options": {
+        "model": "Model Ollama để sử dụng",
+        "temperature": "Nhiệt độ cho quá trình tạo (0.0-1.0)",
+        "commit": "Tự động commit với thông điệp được tạo",
+        "preview": "Chỉ xem trước diff mà không tạo thông điệp",
+        "conventional": "Sử dụng định dạng commit theo quy ước",
+        "language": "Ngôn ngữ cho thông điệp commit"
+      }
+    },
+    "config": {
+      "description": "Quản lý cài đặt cấu hình",
+      "options": {
+        "set": "Đặt giá trị cấu hình",
+        "get": "Lấy giá trị cấu hình",
+        "reset": "Đặt lại cấu hình về mặc định"
+      }
+    },
+    "hook": {
+      "description": "Quản lý tích hợp Git hooks",
+      "options": {
+        "install": "Cài đặt Git hooks",
+        "uninstall": "Gỡ cài đặt Git hooks"
+      }
+    }
+  },
+  "messages": {
+    "stagedFiles": "Các file đã staged:",
+    "noStagedChanges": "Không tìm thấy thay đổi đã staged. Sử dụng git add để stage các thay đổi của bạn.",
+    "notGitRepository": "Lỗi: Không phải là repository git",
+    "checkingOllama": "Đang kiểm tra tình trạng Ollama...",
+    "ollamaNotAvailable": "Ollama không khả dụng. Hãy đảm bảo nó đang chạy.",
+    "ollamaAvailable": "Ollama đã sẵn sàng",
+    "generatingCommitMessage": "Đang tạo thông điệp commit với model %s...",
+    "generatedCommitMessage": "Đã tạo thông điệp commit",
+    "committedSuccessfully": "Đã commit các thay đổi thành công!",
+    "committedWithEditedMessage": "Đã commit các thay đổi thành công với thông điệp đã chỉnh sửa!",
+    "commitCancelled": "Đã hủy commit",
+    "emptyCommitMessage": "Đã hủy commit: Thông điệp commit trống",
+    "noModelsFound": "Không tìm thấy model nào trong Ollama. Vui lòng cài đặt ít nhất một model với:",
+    "modelSuggestion": "ollama pull llama2 hoặc một model khác theo lựa chọn của bạn",
+    "conventionalCommitPrompt": "Chọn loại commit:",
+    "scopePrompt": "Nhập phạm vi (không bắt buộc):",
+    "installingHooks": "Đang cài đặt Git hooks...",
+    "hooksInstalled": "Đã cài đặt Git hooks thành công!",
+    "hooksUninstalled": "Đã gỡ cài đặt Git hooks thành công!",
+    "errorCheckingModels": "Lỗi khi kiểm tra các model: %s",
+    "orAnotherModel": " hoặc một model khác",
+    "stagedChanges": "Các thay đổi đã staged:",
+    "actionPrompt": "Bạn muốn làm gì?",
+    "useAndCommit": "Sử dụng thông điệp này và commit",
+    "editBeforeCommit": "Chỉnh sửa thông điệp trước khi commit",
+    "generateAnother": "Tạo thông điệp khác",
+    "cancel": "Hủy"
+  }
+}
