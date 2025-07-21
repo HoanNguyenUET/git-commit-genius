@@ -63,10 +63,6 @@ function formatCommitMessage(message, type = 'feat', scope = null) {
   return `${header}${finalSubject}${body}`;
 }
 
-/**
- * Get all available conventional commit types
- * @returns {Object} - Map of type to description
- */
 function getCommitTypes() {
   return { ...COMMIT_TYPES };
 }

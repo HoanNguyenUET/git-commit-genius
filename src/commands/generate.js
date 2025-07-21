@@ -1,12 +1,12 @@
 const inquirer = require('inquirer');
 const ora = require('ora');
-const chalk = require('chalk');
 const git = require('../utils/git');
 const ollama = require('../utils/ollama');
 const config = require('../config/config');
 const i18n = require('../locales/language-manager');
 const conventionalCommits = require('../utils/conventional-commits');
 const hookManager = require('../hooks/hook-manager');
+const { colors, indicators, createBox, gradient, chalk } = require('../utils/colors');
 
 /**
  * Register the generate command with the CLI program
@@ -35,20 +35,20 @@ function registerCommand(program) {
         
         // Check if in git repository
         if (!git.isGitRepository()) {
-          console.error(chalk.red(i18n.get('messages.notGitRepository', [], language)));
+          console.error(`${indicators.error} ${colors.error(i18n.get('messages.notGitRepository', [], language))}`);
           return;
         }
 
         // Check if there are staged changes
         if (!git.hasStagedChanges()) {
-          console.error(chalk.yellow(i18n.get('messages.noStagedChanges', [], language)));
+          console.error(`${indicators.warning} ${colors.warning(i18n.get('messages.noStagedChanges', [], language))}`);
           return;
         }
 
         // Get the list of staged files
         const stagedFiles = git.getStagedFiles();
-        console.log(chalk.blue(i18n.get('messages.stagedFiles', [], language)));
-        stagedFiles.forEach(file => console.log(`  ${chalk.green('•')} ${file}`));
+        console.log(`\n${indicators.info} ${colors.info(i18n.get('messages.stagedFiles', [], language))}`);
+        stagedFiles.forEach(file => console.log(`  ${indicators.bullet} ${colors.path(file)}`));
         console.log();
 
         // Get the staged diff
@@ -62,25 +62,28 @@ function registerCommand(program) {
         }
 
         // Check if Ollama is running
-        const spinner = ora(i18n.get('messages.checkingOllama', [], language)).start();
+        const spinner = ora({
+          text: colors.secondary(i18n.get('messages.checkingOllama', [], language)),
+          color: 'cyan'
+        }).start();
         const ollamaAvailable = await ollama.isAvailable();
         
         if (!ollamaAvailable) {
-          spinner.fail(i18n.get('messages.ollamaNotAvailable', [], language));
+          spinner.fail(`${colors.error(i18n.get('messages.ollamaNotAvailable', [], language))}`);
           return;
         }
-        spinner.succeed(i18n.get('messages.ollamaAvailable', [], language));
+        spinner.succeed(`${indicators.success} ${colors.success(i18n.get('messages.ollamaAvailable', [], language))}`);
         
         // Check for available models
         try {
           const models = await ollama.getAvailableModels();
           if (models.length === 0) {
-            console.error(chalk.red(i18n.get('messages.noModelsFound', [], language)));
-            console.error(chalk.yellow('  ollama pull llama2') + i18n.get('messages.orAnotherModel', [], language));
+            console.error(`${indicators.error} ${colors.error(i18n.get('messages.noModelsFound', [], language))}`);
+            console.error(`  ${colors.code('ollama pull llama2')} ${colors.secondary('or another model of your choice')}`);
             return;
           }
         } catch (error) {
-          console.error(chalk.red(i18n.get('messages.errorCheckingModels', [error.message], language)));
+          console.error(`${indicators.error} ${colors.error('Error checking models:')} ${error.message}`);
           return;
         }
 
@@ -88,21 +91,27 @@ function registerCommand(program) {
         const model = options.model || userConfig.model.defaultModel;
         
         // Generate commit message
-        spinner.text = `Generating commit message with ${chalk.green(model)} model...`;
-        spinner.start();
+        const generateSpinner = ora({
+          text: `${colors.secondary('Generating commit message with')} ${colors.accent(model)} ${colors.secondary('model...')}`,
+          color: 'magenta'
+        }).start();
         
         // Get temperature from options or config
         const temperature = options.temperature || userConfig.model.temperature;
         
         // Generate the commit message using the Ollama API
+        // Skip conventional format in prompt if we're going to apply it later
+        const skipConventionalFormat = options.conventional || userConfig.format.useConventionalCommits;
+        
         let commitMessage = await ollama.generateCommitMessage(
           diff,
           model,
           temperature,
-          language
+          language,
+          skipConventionalFormat
         );
         
-        spinner.succeed('Generated commit message');
+        generateSpinner.succeed(`${indicators.success} ${colors.success('Generated commit message')}`);
         
         // Apply conventional commit format if requested
         if (options.conventional || userConfig.format.useConventionalCommits) {
@@ -111,15 +120,17 @@ function registerCommand(program) {
           commitMessage = conventionalCommits.formatCommitMessage(commitMessage, type, scope);
         }
         
-        // Display the generated commit message
-        console.log('\n' + chalk.blue(i18n.get('messages.generatedCommitMessage', [], language)));
-        console.log(chalk.green(commitMessage));
+        // Display the generated commit message in a beautiful box
+        console.log('\n' + createBox(
+          `${indicators.star} ${colors.primary('Generated Commit Message')}\n\n${colors.highlight(commitMessage)}`,
+          { color: colors.gradient.cyan, padding: 2 }
+        ));
         console.log();
         
         // If --commit flag is set, commit directly
         if (options.commit) {
           git.commit(commitMessage);
-          console.log(chalk.green('Changes committed successfully!'));
+          console.log(`${indicators.rocket} ${colors.success('Changes committed successfully!')}`);
           return;
         }
         
@@ -128,19 +139,31 @@ function registerCommand(program) {
           {
             type: 'list',
             name: 'action',
-            message: language === 'vi' ? i18n.get('messages.actionPrompt', [], language) : 'What would you like to do?',
+            message: colors.info('What would you like to do?'),
             choices: [
-              { name: language === 'vi' ? i18n.get('messages.useAndCommit', [], language) : 'Use this message and commit', value: 'commit' },
-              { name: language === 'vi' ? i18n.get('messages.editBeforeCommit', [], language) : 'Edit the message before committing', value: 'edit' },
-              { name: language === 'vi' ? i18n.get('messages.generateAnother', [], language) : 'Generate another message', value: 'regenerate' },
-              { name: language === 'vi' ? i18n.get('messages.cancel', [], language) : 'Cancel', value: 'cancel' }
+              { 
+                name: `${indicators.check} ${colors.success('Use this message and commit')}`, 
+                value: 'commit' 
+              },
+              { 
+                name: `${indicators.gear} ${colors.warning('Edit the message before committing')}`, 
+                value: 'edit' 
+              },
+              { 
+                name: `${indicators.loading} ${colors.info('Generate another message')}`, 
+                value: 'regenerate' 
+              },
+              { 
+                name: `${indicators.cross} ${colors.error('Cancel')}`, 
+                value: 'cancel' 
+              }
             ]
           }
         ]);
         
         if (action === 'commit') {
           git.commit(commitMessage);
-          console.log(chalk.green('Changes committed successfully!'));
+          console.log(`${indicators.rocket} ${colors.success('Changes committed successfully!')}`);
           
           // If running as a hook, tell the hook manager the commit was successful
           if (options.hook) {
@@ -151,21 +174,21 @@ function registerCommand(program) {
             {
               type: 'editor',
               name: 'editedMessage',
-              message: 'Edit the commit message:',
+              message: colors.info('Edit the commit message:'),
               default: commitMessage
             }
           ]);
           
           if (editedMessage.trim()) {
             git.commit(editedMessage);
-            console.log(chalk.green('Changes committed successfully with edited message!'));
+            console.log(`${indicators.rocket} ${colors.success('Changes committed successfully with edited message!')}`);
             
             // If running as a hook, tell the hook manager the commit was successful
             if (options.hook) {
               hookManager.completeHook(true, editedMessage);
             }
           } else {
-            console.log(chalk.yellow('Commit cancelled: Empty commit message'));
+            console.log(`${indicators.warning} ${colors.warning('Commit cancelled: Empty commit message')}`);
             
             // If running as a hook, tell the hook manager the commit was cancelled
             if (options.hook) {
@@ -187,7 +210,7 @@ function registerCommand(program) {
           
           program.parse(commandArgs);
         } else {
-          console.log(chalk.yellow('Commit cancelled'));
+          console.log(`${indicators.warning} ${colors.warning('Commit cancelled')}`);
           
           // If running as a hook, tell the hook manager the commit was cancelled
           if (options.hook) {
@@ -196,7 +219,7 @@ function registerCommand(program) {
         }
         
       } catch (error) {
-        console.error(chalk.red(`Error: ${error.message}`));
+        console.error(`${indicators.error} ${colors.error(`Error: ${error.message}`)}`);
         process.exit(1);
       }
     });

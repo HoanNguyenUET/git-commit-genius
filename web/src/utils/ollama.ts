@@ -4,137 +4,132 @@ export interface OllamaResponse {
 
 export interface CommitMessageRequest {
   diff: string;
-  language: 'en' | 'vi';
   conventional: boolean;
   model?: string;
   temperature?: number;
 }
 
-// Using a public API service instead of local Ollama
-const API_BASE_URL = 'https://api.openai.com/v1'; // You can change this to any other API
-const API_KEY = 'your-api-key-here'; // This should be in environment variables
-
 export class OllamaService {
+  private static readonly OLLAMA_BASE_URL = 'http://localhost:11434';
+
   static async isAvailable(): Promise<boolean> {
     try {
-      // For demo purposes, we'll always return true for online API
-      // In production, you might want to test the API endpoint
-      return true;
+      const response = await fetch(`${this.OLLAMA_BASE_URL}/api/tags`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.ok;
     } catch (error) {
+      console.error('Ollama availability check failed:', error);
       return false;
     }
   }
 
   static async getAvailableModels(): Promise<string[]> {
     try {
-      // Return some common models for online API
-      return ['gpt-3.5-turbo', 'gpt-4', 'claude-3-sonnet', 'llama2-online'];
+      const response = await fetch(`${this.OLLAMA_BASE_URL}/api/tags`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch models');
+      }
+      
+      const data = await response.json();
+      if (data && data.models) {
+        return data.models.map((model: { name: string }) => model.name);
+      }
+      return [];
     } catch (error) {
-      return ['gpt-3.5-turbo']; // Default fallback
+      console.error('Error fetching models:', error);
+      return ['llama2']; // Default fallback
     }
   }
 
-  // Fallback to a simple local AI service or mock response
   static async generateCommitMessage({
     diff,
-    language = 'en',
     conventional = false,
-    model = 'gpt-3.5-turbo',
+    model = 'llama2',
     temperature = 0.7
   }: CommitMessageRequest): Promise<string> {
     if (!diff) {
       throw new Error('No diff provided');
     }
 
-    // For demo purposes, let's create a simple rule-based generator
-    // since we don't have a real online API configured
-    return this.generateMockCommitMessage(diff, language, conventional);
-  }
-
-  private static generateMockCommitMessage(diff: string, language: 'en' | 'vi', conventional: boolean): string {
-    // Simple pattern matching for demo
-    const lines = diff.split('\n');
-    const addedLines = lines.filter(line => line.startsWith('+') && !line.startsWith('+++'));
-    const removedLines = lines.filter(line => line.startsWith('-') && !line.startsWith('---'));
-    
-    let action = '';
-    let subject = '';
-    
-    // Determine action based on changes
-    if (addedLines.length > removedLines.length) {
-      action = language === 'vi' ? 'Thêm' : 'Add';
-    } else if (removedLines.length > addedLines.length) {
-      action = language === 'vi' ? 'Xóa' : 'Remove';
-    } else {
-      action = language === 'vi' ? 'Cập nhật' : 'Update';
-    }
-    
-    // Try to determine what was changed
-    if (diff.includes('function') || diff.includes('const ') || diff.includes('let ')) {
-      subject = language === 'vi' ? 'hàm' : 'function';
-    } else if (diff.includes('class ')) {
-      subject = language === 'vi' ? 'lớp' : 'class';
-    } else if (diff.includes('import') || diff.includes('require')) {
-      subject = language === 'vi' ? 'import' : 'imports';
-    } else if (diff.includes('.css') || diff.includes('style')) {
-      subject = language === 'vi' ? 'CSS' : 'styles';
-    } else if (diff.includes('.md') || diff.includes('README')) {
-      subject = language === 'vi' ? 'tài liệu' : 'documentation';
-    } else {
-      subject = language === 'vi' ? 'mã' : 'code';
-    }
-    
-    let message = `${action} ${subject}`;
-    
-    if (conventional) {
-      const type = addedLines.length > removedLines.length ? 'feat' : 
-                   removedLines.length > 0 ? 'fix' : 'refactor';
-      message = `${type}: ${message}`;
-    }
-    
-    return message;
-  }
-
-  // Alternative: Use a real online API (commented out for demo)
-  /*
-  static async generateCommitMessage({
-    diff,
-    language = 'en',
-    conventional = false,
-    model = 'gpt-3.5-turbo',
-    temperature = 0.7
-  }: CommitMessageRequest): Promise<string> {
-    const languagePrompts = {
-      en: 'Generate a concise git commit message (max 50 chars) for this diff:',
-      vi: 'Tạo thông điệp commit ngắn gọn (tối đa 50 ký tự) cho diff này:'
-    };
-
-    const prompt = `${languagePrompts[language]}\n\n${diff}\n\n${conventional ? 'Use conventional commits format.' : ''}`;
+    // Create the prompt for commit message generation (default to English)
+    const prompt = this.createPrompt(diff);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/chat/completions`, {
+      const response = await fetch(`${this.OLLAMA_BASE_URL}/api/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
         },
         body: JSON.stringify({
-          model,
-          messages: [{ role: 'user', content: prompt }],
-          temperature,
-          max_tokens: 100
-        })
+          model: model,
+          prompt: prompt,
+          temperature: Math.min(temperature, 0.3), // Reduce temperature for faster, more consistent responses
+          stream: false,
+          options: {
+            num_predict: 50, // Limit response length
+            top_p: 0.9,
+            top_k: 40
+          }
+        }),
       });
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
+        throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json();
-      return data.choices[0].message.content.trim();
+      const data: OllamaResponse = await response.json();
+      
+      if (!data.response) {
+        throw new Error('No response from Ollama API');
+      }
+
+      return this.cleanCommitMessage(data.response);
     } catch (error) {
-      throw new Error(`Error generating commit message: ${error.message}`);
+      console.error('Error calling Ollama API:', error);
+      throw new Error(`Failed to generate commit message: ${error}`);
     }
   }
-  */
+
+  private static cleanCommitMessage(message: string): string {
+    // Remove common unwanted prefixes and suffixes
+    let cleaned = message
+      .replace(/^(commit message:|commit:|message:)/i, '')
+      .replace(/^(here is|this is|the commit message is)/i, '')
+      .replace(/\.$/, '') // Remove trailing period
+      .trim();
+    
+    // Take only the first line if multiple lines
+    cleaned = cleaned.split('\n')[0].trim();
+    
+    // Limit to reasonable length (50 chars)
+    if (cleaned.length > 50) {
+      cleaned = cleaned.substring(0, 47) + '...';
+    }
+    
+    return cleaned;
+  }
+
+  private static createPrompt(diff: string): string {
+    const promptIntro = `Create a SHORT commit message (max 10 words) for this git diff:`;
+    const examples = 'EXAMPLES: "Add test function", "Fix auth bug", "Update README"';
+    const ending = 'ONLY respond with commit message, NO explanation:';
+
+    return `${promptIntro}
+
+${diff}
+
+${examples}
+
+${ending}`;
+  }
 }

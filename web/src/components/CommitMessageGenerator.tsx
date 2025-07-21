@@ -6,7 +6,6 @@ const CommitMessageGenerator = () => {
   const [commitMessage, setCommitMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [language, setLanguage] = useState<'en' | 'vi'>('en');
   const [conventional, setConventional] = useState<boolean>(false);
   const [model, setModel] = useState<string>('llama2');
   const [temperature, setTemperature] = useState<number>(0.7);
@@ -47,7 +46,6 @@ const CommitMessageGenerator = () => {
     try {
       const message = await OllamaService.generateCommitMessage({
         diff,
-        language,
         conventional,
         model,
         temperature
@@ -81,7 +79,7 @@ const CommitMessageGenerator = () => {
         🧠 Git Commit Genius Web
       </h1>
 
-      {/* API Status */}
+      {/* Ollama Status */}
       <div style={{ 
         marginBottom: '20px', 
         padding: '10px', 
@@ -90,11 +88,11 @@ const CommitMessageGenerator = () => {
         border: `1px solid ${ollamaAvailable ? '#c3e6cb' : '#f5c6cb'}`,
         color: ollamaAvailable ? '#155724' : '#721c24'
       }}>
-        <strong>AI Service Status: </strong>
+        <strong>Ollama Status: </strong>
         {ollamaAvailable ? '✅ Available' : '❌ Not Available'}
         {!ollamaAvailable && (
           <div style={{ marginTop: '5px', fontSize: '14px' }}>
-            Using offline mode with rule-based commit message generation
+            Make sure Ollama is running: <code>ollama serve</code>
           </div>
         )}
       </div>
@@ -110,20 +108,6 @@ const CommitMessageGenerator = () => {
         <h3 style={{ marginTop: '0' }}>Configuration</h3>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Language:
-            </label>
-            <select 
-              value={language} 
-              onChange={(e) => setLanguage(e.target.value as 'en' | 'vi')}
-              style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-            >
-              <option value="en">English</option>
-              <option value="vi">Tiếng Việt</option>
-            </select>
-          </div>
-
           <div>
             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
               Model:

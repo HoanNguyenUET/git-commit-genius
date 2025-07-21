@@ -17,13 +17,11 @@ class LanguageManager {
    */
   loadLanguages() {
     try {
-      // Get available language files
-      const langFiles = fs.readdirSync(this.localesDir)
-        .filter(file => file.endsWith('.json'))
-        .map(file => file.replace('.json', ''));
+      // Only load supported languages: en and vi
+      const supportedLanguages = ['en', 'vi'];
       
-      // Load each language file
-      for (const lang of langFiles) {
+      // Load each supported language file
+      for (const lang of supportedLanguages) {
         const langPath = path.join(this.localesDir, `${lang}.json`);
         if (fs.existsSync(langPath)) {
           try {

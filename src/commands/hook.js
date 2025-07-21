@@ -1,9 +1,9 @@
 /**
  * Command to install or remove Git hooks
  */
-const chalk = require('chalk');
 const hookManager = require('../hooks/hook-manager');
 const i18n = require('../locales/language-manager');
+const { colors, indicators, createBox } = require('../utils/colors');
 
 /**
  * Register the hook command with the CLI program
@@ -23,18 +23,18 @@ function registerCommand(program) {
         if (options.install) {
           const result = hookManager.installHooks();
           if (result) {
-            console.log(chalk.green('Git hooks installed successfully'));
+            console.log(`${indicators.success} ${colors.success('Git hooks installed successfully')}`);
           }
         } else if (options.remove) {
           const result = hookManager.removeHooks();
           if (result) {
-            console.log(chalk.green('Git hooks removed successfully'));
+            console.log(`${indicators.success} ${colors.success('Git hooks removed successfully')}`);
           }
         } else {
-          console.log(chalk.yellow('Please specify --install or --remove'));
+          console.log(`${indicators.info} ${colors.info('Please specify --install or --remove')}`);
         }
       } catch (error) {
-        console.error(chalk.red(`Error: ${error.message}`));
+        console.error(`${indicators.error} ${colors.error(`Error: ${error.message}`)}`);
       }
     });
 }
