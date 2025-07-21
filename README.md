@@ -8,11 +8,12 @@ Git Commit Genius is a command-line tool that helps developers create meaningful
 
 ## Features
 
-- Automatically analyze staged changes in your git repository
-- Generate context-aware, high-quality commit messages using Ollama
-- Interactive mode for reviewing, editing, or regenerating commit messages
-- Customizable AI model and temperature settings
-- Option to automatically commit with the generated message
+- 🤖 **Automatic Analysis**: Analyze staged changes in your git repository
+- 🧠 **AI-Generated Messages**: Generate context-aware, high-quality commit messages using Ollama
+- 📝 **Conventional Commits Support**: Follow the Conventional Commits standard (type(scope): message)
+- 🌍 **Multilingual**: Support for English and Vietnamese
+- 🪝 **Git Hooks Integration**: Install as a git hook to automate your commit process
+- ⚙️ **Customizable Configuration**: Store and manage user configuration
 
 ## Prerequisites
 
@@ -62,16 +63,44 @@ git-commit-genius generate --commit
 
 # Preview the diff without generating a message
 git-commit-genius generate --preview
+
+# Generate commit message using conventional format
+git-commit-genius generate --conventional
+
+# Generate commit message in Vietnamese
+git-commit-genius generate --language vi
 ```
 
 ## Options
 
-- `-m, --model <model>` - Specify which Ollama model to use (default: llama3)
-- `-t, --temperature <temperature>` - Set the temperature for AI generation (0.0-1.0)
-- `-c, --commit` - Automatically commit with the generated message
-- `-p, --preview` - Show the diff without generating a message
-- `-v, --version` - Show the version number
-- `-h, --help` - Display help for command
+### Generate Command
+
+| Option | Description |
+|--------|-------------|
+| `-m, --model <model>` | Specify which Ollama model to use (default: llama3) |
+| `-t, --temperature <temperature>` | Set the temperature for AI generation (0.0-1.0) |
+| `-c, --commit` | Automatically commit with the generated message |
+| `-p, --preview` | Show the diff without generating a message |
+| `-v, --conventional` | Use conventional commit format |
+| `-l, --language <language>` | Language for commit message (en, vi) |
+| `--type <type>` | Conventional commit type (feat, fix, docs, ...) |
+| `--scope <scope>` | Scope for conventional commit |
+
+### Config Command
+
+| Option | Description |
+|--------|-------------|
+| `-s, --set <key=value>` | Set configuration value |
+| `-g, --get <key>` | Get configuration value |
+| `-l, --list` | List all configuration values |
+| `-r, --reset` | Reset configuration to defaults |
+
+### Hook Command
+
+| Option | Description |
+|--------|-------------|
+| `-i, --install` | Install Git hooks |
+| `-r, --remove` | Remove Git hooks |
 
 ## Workflow Integration
 
@@ -83,6 +112,66 @@ Git Commit Genius is designed to fit seamlessly into your development workflow:
 4. Review the generated commit message
 5. Optionally edit the message
 6. Commit your changes
+
+## Project Structure
+
+### Key Files
+
+- **bin/index.js**: Main entry point of the application, registers commands
+- **src/commands/generate.js**: Command to generate commit messages
+- **src/commands/config.js**: Command to manage configuration
+- **src/commands/hook.js**: Command to manage Git hooks
+- **src/utils/git.js**: Utilities for Git operations
+- **src/utils/ollama.js**: Utilities for interacting with Ollama API
+- **src/utils/conventional-commits.js**: Handling conventional commits format
+- **src/config/config.js**: User configuration management
+- **src/hooks/hook-manager.js**: Manages installing/removing Git hooks
+- **src/locales/**: Directory containing language files (en.json, vi.json)
+
+## Technical Details
+
+### src/utils/git.js
+
+This file contains utility functions for interacting with Git:
+- `isGitRepository()`: Check if the current directory is a Git repository
+- `getStagedDiff()`: Get the diff of staged changes
+- `getStagedFiles()`: Get a list of staged files
+- `hasStagedChanges()`: Check if there are any staged changes
+- `commit(message)`: Perform a commit with the provided message
+
+### src/utils/ollama.js
+
+This file handles interaction with the Ollama API:
+- `isAvailable()`: Check if Ollama is available
+- `getAvailableModels()`: Get a list of available models from Ollama
+- `generateCommitMessage(diff, model, temperature, language)`: Generate a commit message based on diff and provided parameters
+
+### src/utils/conventional-commits.js
+
+This file handles conventional commits formatting:
+- `formatCommitMessage(message, type, scope)`: Format a message according to conventional commits standard
+- `getCommitTypes()`: Get a list of conventional commit types
+
+### src/config/config.js
+
+This file manages user configuration:
+- `getConfig()`: Get the current configuration
+- `setConfigValue(key, value)`: Set a configuration value
+- `getConfigValue(key)`: Get a configuration value by key
+- `resetConfig()`: Reset the configuration to defaults
+
+### src/hooks/hook-manager.js
+
+This file manages Git hooks:
+- `installHooks()`: Install Git hooks
+- `removeHooks()`: Remove Git hooks
+- `completeHook(success, message)`: Complete the hook process
+
+### src/locales/language-manager.js
+
+This file manages the multilingual system:
+- `get(key, args, language)`: Get a translated string by key and language
+- `getAvailableLanguages()`: Get a list of available languages
 
 ## License
 

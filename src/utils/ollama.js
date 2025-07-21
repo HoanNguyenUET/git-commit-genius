@@ -50,24 +50,6 @@ async function generateCommitMessage(diff, model = 'llama2', temperature = 0.7, 
       conventionalFormat: 'Use the Conventional Commits format: type(scope): description\nTypes: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nChoose the most appropriate type based on the changes.',
       ending: 'Respond ONLY with the commit message, nothing else.'
     },
-    es: {
-      intro: 'Eres un ingeniero de software senior encargado de escribir mensajes de commit de git de alta calidad.',
-      instructions: '- Comienza con una línea de resumen corta (máximo 50 caracteres) que complete la frase "Si se aplica, este commit..."\n- Usa el modo imperativo (ej. "Añadir", "Arreglar", "Actualizar")\n- Opcionalmente incluye una descripción más detallada después del resumen, con saltos de línea a los 72 caracteres\n- Enfócate en POR QUÉ y QUÉ, no en CÓMO\n- Referencia números de issue si es relevante',
-      conventionalFormat: 'Usa el formato de Commits Convencionales: tipo(ámbito): descripción\nTipos: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nElige el tipo más apropiado basado en los cambios.',
-      ending: 'Responde SOLO con el mensaje de commit, nada más.'
-    },
-    fr: {
-      intro: 'Vous êtes un ingénieur logiciel senior chargé de rédiger des messages de commit git de haute qualité.',
-      instructions: '- Commencez par une ligne de résumé courte (max 50 caractères) qui complète la phrase "Si appliqué, ce commit va..."\n- Utilisez le mode impératif (ex. "Ajouter", "Corriger", "Mettre à jour")\n- Incluez éventuellement une description plus détaillée après le résumé, avec des sauts de ligne à 72 caractères\n- Concentrez-vous sur POURQUOI et QUOI, pas sur COMMENT\n- Référencez les numéros de problèmes si pertinent',
-      conventionalFormat: 'Utilisez le format Conventional Commits: type(portée): description\nTypes: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nChoisissez le type le plus approprié en fonction des changements.',
-      ending: 'Répondez UNIQUEMENT avec le message de commit, rien d\'autre.'
-    },
-    de: {
-      intro: 'Sie sind ein erfahrener Software-Ingenieur mit der Aufgabe, hochwertige Git-Commit-Nachrichten zu schreiben.',
-      instructions: '- Beginnen Sie mit einer kurzen Zusammenfassung (max. 50 Zeichen), die den Satz "Wenn angewendet, wird dieser Commit..." vervollständigt\n- Verwenden Sie den Imperativ (z.B. "Hinzufügen", "Beheben", "Aktualisieren")\n- Fügen Sie optional eine detailliertere Beschreibung nach der Zusammenfassung hinzu, mit Zeilenumbrüchen bei 72 Zeichen\n- Konzentrieren Sie sich auf WARUM und WAS, nicht auf WIE\n- Referenzieren Sie Issue-Nummern, falls relevant',
-      conventionalFormat: 'Verwenden Sie das Conventional Commits Format: Typ(Umfang): Beschreibung\nTypen: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert\nWählen Sie den passendsten Typ basierend auf den Änderungen.',
-      ending: 'Antworten Sie NUR mit der Commit-Nachricht, nichts anderes.'
-    },
     vi: {
       intro: 'Bạn là một kỹ sư phần mềm senior có nhiệm vụ viết các thông điệp commit git chất lượng cao.',
       instructions: '- Bắt đầu bằng một dòng tóm tắt ngắn (tối đa 50 ký tự) hoàn thành câu "Nếu áp dụng, commit này sẽ..."\n- Sử dụng thì mệnh lệnh (ví dụ: "Thêm", "Sửa", "Cập nhật")\n- Tùy chọn thêm mô tả chi tiết hơn sau phần tóm tắt, với ngắt dòng ở ký tự thứ 72\n- Tập trung vào TẠI SAO và CÁI GÌ, không phải LÀM THẾ NÀO\n- Tham chiếu số issue nếu có liên quan',

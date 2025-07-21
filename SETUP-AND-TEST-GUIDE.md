@@ -1,30 +1,30 @@
-# Git Commit Genius - Setup and Testing Guide
+# Git Commit Genius - Hướng dẫn Thiết lập và Kiểm thử
 
-This guide provides instructions for setting up the required environment and testing the basic features of Git Commit Genius.
+Hướng dẫn này cung cấp các bước để thiết lập môi trường cần thiết và kiểm thử các tính năng cơ bản của Git Commit Genius.
 
-## Setup Requirements
+## Yêu cầu cài đặt
 
-### 1. Install Node.js
+### 1. Cài đặt Node.js
 
 ```bash
 # Ubuntu/Debian
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-# macOS (using Homebrew)
+# macOS (sử dụng Homebrew)
 brew install node
 
 # Windows
-# Download and install from https://nodejs.org/en/download/
+# Tải và cài đặt từ https://nodejs.org/en/download/
 ```
 
-Verify installation:
+Xác minh cài đặt:
 ```bash
-node --version  # Should show v18.x or higher
-npm --version   # Should show 8.x or higher
+node --version  # Nên hiển thị v18.x hoặc cao hơn
+npm --version   # Nên hiển thị 8.x hoặc cao hơn
 ```
 
-### 2. Install Git
+### 2. Cài đặt Git
 
 ```bash
 # Ubuntu/Debian
@@ -34,272 +34,314 @@ sudo apt-get install git
 brew install git
 
 # Windows
-# Download and install from https://git-scm.com/download/win
+# Tải và cài đặt từ https://git-scm.com/download/win
 ```
 
-Verify installation:
+Xác minh cài đặt:
 ```bash
-git --version  # Should show 2.x or higher
+git --version  # Nên hiển thị 2.x hoặc cao hơn
 ```
 
-### 3. Install Ollama
+### 3. Cài đặt Ollama
 
 ```bash
 # macOS/Linux
 curl -fsSL https://ollama.com/install.sh | sh
 
 # Windows
-# Download from https://ollama.com/download
+# Tải từ https://ollama.com/download
 ```
 
-Start Ollama service:
+Khởi động dịch vụ Ollama:
 ```bash
 # macOS/Linux
 ollama serve
 
 # Windows
-# Run the Ollama application
+# Chạy ứng dụng Ollama
 ```
 
-### 4. Install a Language Model
+### 4. Cài đặt Model ngôn ngữ
 
 ```bash
-# Install a small model to start with
+# Cài đặt model nhỏ để bắt đầu
 ollama pull llama2  # ~4GB
 
-# Alternative smaller model
+# Model nhỏ hơn (lựa chọn thay thế)
 ollama pull mistral  # ~4GB
 ```
 
-Verify Ollama is running with installed models:
+Xác minh Ollama đang chạy với các model đã cài đặt:
 ```bash
-ollama list  # Should show your installed models
-curl http://localhost:11434/api/tags  # Should return JSON with models
+ollama list  # Nên hiển thị các model đã cài đặt
+curl http://localhost:11434/api/tags  # Nên trả về JSON với các model
 ```
 
-### 5. Install Git Commit Genius
+### 5. Cài đặt Git Commit Genius
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/HoanNguyenUET/git-commit-genius.git
 cd git-commit-genius
 
-# Install dependencies
+# Cài đặt các dependencies
 npm install
 
-# Link package for global usage
+# Liên kết package để sử dụng toàn cục
 npm link
 ```
 
-## Basic Feature Testing
+## Kiểm thử tính năng cơ bản
 
-### Test 1: Verify Installation
+### Kiểm thử 1: Xác minh cài đặt
 
 ```bash
-# Check if git-commit-genius is available
+# Kiểm tra nếu git-commit-genius khả dụng
 git-commit-genius --version
 ```
 
-Expected output: Should display version information
+Kết quả mong đợi: Hiển thị thông tin phiên bản
 
-### Test 2: Create Test Repository
+### Kiểm thử 2: Tạo repository kiểm thử
 
 ```bash
-# Create a test directory
+# Tạo thư mục kiểm thử
 mkdir gcg-test
 cd gcg-test
 git init
 
-# Create some test files
+# Tạo một số file kiểm thử
 echo "# Test Project" > README.md
 echo "console.log('Hello world');" > index.js
 
-# Make initial commit
+# Commit ban đầu
 git add .
 git commit -m "Initial commit"
 ```
 
-### Test 3: Generate Basic Commit Message
+### Kiểm thử 3: Tạo thông điệp commit cơ bản
 
 ```bash
-# Make changes to test
-echo "// New function" >> index.js
+# Thực hiện thay đổi để kiểm thử
+echo "// Hàm mới" >> index.js
 echo "function test() { return true; }" >> index.js
 
-# Stage the changes
+# Stage các thay đổi
 git add index.js
 
-# Generate commit message
+# Tạo thông điệp commit
 git-commit-genius generate
 ```
 
-Expected output:
-- List of staged files
-- Confirmation that Ollama is available
-- Generated commit message
-- Options to commit, edit, regenerate or cancel
+Kết quả mong đợi:
+- Danh sách các file đã stage
+- Xác nhận rằng Ollama khả dụng
+- Thông điệp commit được tạo
+- Các tùy chọn để commit, chỉnh sửa, tạo lại hoặc hủy
 
-### Test 4: Test Commit Option
+### Kiểm thử 4: Kiểm thử tùy chọn Commit
 
-After running the generate command and seeing the generated message:
-- Select "Use this message and commit"
+Sau khi chạy lệnh generate và thấy thông điệp được tạo:
+- Chọn "Use this message and commit"
 
-Expected output:
-- Confirmation that changes were committed
-- Verify with `git log -1` to see your new commit
+Kết quả mong đợi:
+- Xác nhận rằng các thay đổi đã được commit
+- Kiểm tra với `git log -1` để xem commit mới của bạn
 
-### Test 5: Test Preview Feature
+### Kiểm thử 5: Kiểm thử tính năng xem trước
 
 ```bash
-# Make another change
+# Thực hiện thay đổi khác
 echo "const VERSION = '1.0.0';" >> index.js
 git add index.js
 
-# Use preview option
+# Sử dụng tùy chọn xem trước
 git-commit-genius generate --preview
 ```
 
-Expected output:
-- Should show git diff without generating a commit message
+Kết quả mong đợi:
+- Nên hiển thị git diff mà không tạo thông điệp commit
 
-### Test 6: Test Language Options
-
-```bash
-# Make another change
-echo "// Multilanguage test" >> index.js
-git add index.js
-
-# Generate in Spanish
-git-commit-genius generate --language es
-```
-
-Expected output:
-- Interface text should be in Spanish
-- Generated commit message should be in Spanish
-
-### Test 7: Test Vietnamese Language
+### Kiểm thử 6: Kiểm thử ngôn ngữ tiếng Việt
 
 ```bash
-# Make another change
+# Thực hiện thay đổi khác
 echo "// Kiểm tra tiếng Việt" >> index.js
 git add index.js
 
-# Generate in Vietnamese
+# Tạo bằng tiếng Việt
 git-commit-genius generate --language vi
 ```
 
-Expected output:
-- Interface text should be in Vietnamese
-- Generated commit message should be in Vietnamese
+Kết quả mong đợi:
+- Văn bản giao diện nên hiển thị bằng tiếng Việt
+- Thông điệp commit được tạo nên bằng tiếng Việt
 
-### Test 8: Test Conventional Commits
+### Kiểm thử 7: Kiểm thử Conventional Commits
 
 ```bash
-# Add a new file
+# Thêm một file mới
 echo "body { margin: 0; }" > styles.css
 git add styles.css
 
-# Generate with conventional format
+# Tạo với định dạng conventional
 git-commit-genius generate --conventional
 ```
 
-Expected output:
-- Generated message should follow conventional format (e.g., "feat: Add styles.css with basic CSS")
+Kết quả mong đợi:
+- Thông điệp được tạo nên tuân theo định dạng conventional (ví dụ: "feat: Add styles.css with basic CSS")
 
-### Test 9: Test Direct Commit
+### Kiểm thử 8: Kiểm thử tính năng Commit trực tiếp
 
 ```bash
-# Add another change
+# Thêm thay đổi khác
 echo "* { box-sizing: border-box; }" >> styles.css
 git add styles.css
 
-# Generate and commit directly
+# Tạo và commit trực tiếp
 git-commit-genius generate --commit
 ```
 
-Expected output:
-- Tool should generate message and commit immediately
-- Verify with `git log -1` to see your commit
+Kết quả mong đợi:
+- Công cụ nên tạo thông điệp và commit ngay lập tức
+- Kiểm tra với `git log -1` để xem commit của bạn
 
-### Test 10: Test Configuration
+### Kiểm thử 9: Kiểm thử cấu hình
 
 ```bash
-# View current configuration
+# Xem cấu hình hiện tại
 git-commit-genius config
 
-# Set default model
+# Đặt model mặc định
 git-commit-genius config --set model.defaultModel=llama2
 
-# Set default language
+# Đặt ngôn ngữ mặc định là tiếng Việt
 git-commit-genius config --set language.defaultLanguage=vi
 
-# Test that configuration works
+# Kiểm tra rằng cấu hình hoạt động
 git-commit-genius generate
 ```
 
-Expected output:
-- Default settings should be applied (Vietnamese language)
-- Reset configuration when done:
+Kết quả mong đợi:
+- Các cài đặt mặc định nên được áp dụng (ngôn ngữ tiếng Việt)
+- Đặt lại cấu hình khi hoàn thành:
 ```bash
 git-commit-genius config --reset
 ```
 
-## Troubleshooting Common Issues
+## Xử lý vấn đề thường gặp
 
-### 1. Ollama Connection Issues
+### 1. Vấn đề kết nối Ollama
 
-If you see "Ollama is not available" error:
+Nếu bạn thấy lỗi "Ollama is not available":
 ```bash
-# Check if Ollama is running
+# Kiểm tra nếu Ollama đang chạy
 curl http://localhost:11434/api/tags
 
-# If not running, start it
+# Nếu không chạy, khởi động nó
 ollama serve
 ```
 
-### 2. Model Not Found Issues
+### 2. Vấn đề không tìm thấy Model
 
-If you see errors about models not being available:
+Nếu bạn thấy lỗi về model không khả dụng:
 ```bash
-# List installed models
+# Liệt kê các model đã cài đặt
 ollama list
 
-# Install a model if needed
+# Cài đặt model nếu cần
 ollama pull llama2
 ```
 
-### 3. Git Issues
+### 3. Vấn đề Git
 
-If Git operations fail:
+Nếu các thao tác Git thất bại:
 ```bash
-# Check if you're in a git repository
+# Kiểm tra nếu bạn đang ở trong một repository git
 git status
 
-# Check if you have changes staged
+# Kiểm tra nếu bạn có thay đổi đã staged
 git diff --staged
 ```
 
-### 4. Node.js/NPM Issues
+### 4. Vấn đề Node.js/NPM
 
-If you encounter JavaScript errors:
+Nếu bạn gặp lỗi JavaScript:
 ```bash
-# Make sure all dependencies are installed
+# Đảm bảo tất cả dependencies được cài đặt
 npm install
 
-# Check for Node.js version compatibility
-node --version # Should be v14.x or higher
+# Kiểm tra phiên bản Node.js tương thích
+node --version # Nên là v14.x hoặc cao hơn
 ```
 
-## Next Steps
+### 5. Vấn đề Model cụ thể (codellama)
 
-After verifying these basic features work correctly, you can explore more advanced features:
+Nếu bạn gặp lỗi "model 'codellama' not found":
+```bash
+# Sử dụng một model đã cài đặt
+git-commit-genius generate --model llama2
 
-- Git hooks integration (`git-commit-genius hook --install`)
-- Custom temperature settings (`--temperature` option)
-- Different Ollama models (try with different models)
+# Hoặc cài đặt model codellama
+ollama pull codellama
+```
 
-For more detailed options, run:
+## Bước tiếp theo
+
+Sau khi xác minh các tính năng cơ bản hoạt động chính xác, bạn có thể khám phá các tính năng nâng cao hơn:
+
+- Tích hợp Git hooks (`git-commit-genius hook --install`)
+- Cài đặt nhiệt độ tùy chỉnh (`--temperature` option)
+- Các model Ollama khác nhau (thử với các model khác)
+
+Để biết thêm về các tùy chọn chi tiết, chạy:
 ```bash
 git-commit-genius --help
 git-commit-genius generate --help
+```
+
+## Tắt công cụ Git Commit Genius
+
+Để tắt hoặc ngừng sử dụng công cụ Git Commit Genius:
+
+### 1. Ngừng sử dụng tạm thời
+
+Đơn giản là không sử dụng lệnh `git-commit-genius` và quay lại các lệnh Git thông thường:
+
+```bash
+# Thay vì sử dụng git-commit-genius generate
+git commit -m "Thông điệp commit của bạn"
+```
+
+### 2. Hủy liên kết lệnh toàn cục
+
+```bash
+# Điều hướng đến thư mục git-commit-genius
+cd /path/to/git-commit-genius
+
+# Hủy liên kết package
+npm unlink
+
+# Hoặc hủy liên kết toàn cục từ bất kỳ đâu
+npm unlink -g git-commit-genius
+```
+
+### 3. Gỡ bỏ Git hooks (nếu đã cài đặt)
+
+```bash
+# Sử dụng lệnh tích hợp
+git-commit-genius hook --remove
+
+# Hoặc gỡ bỏ hook thủ công
+rm -f .git/hooks/prepare-commit-msg
+```
+
+### 4. Dừng dịch vụ Ollama
+
+```bash
+# Trên Linux/macOS
+pkill ollama
+
+# Hoặc nếu bạn khởi động với 'ollama serve'
+# Nhấn Ctrl+C trong terminal đang chạy nó
 ```

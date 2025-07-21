@@ -11,7 +11,7 @@ Git Commit Genius là một công cụ dòng lệnh giúp lập trình viên t�
 - 🤖 **Phân tích tự động**: Phân tích các thay đổi đã staged trong kho git
 - 🧠 **AI tạo thông điệp**: Sử dụng Ollama để tạo thông điệp commit chất lượng cao
 - 📝 **Hỗ trợ Conventional Commits**: Tuân thủ chuẩn Conventional Commits (type(scope): message)
-- 🌍 **Đa ngôn ngữ**: Hỗ trợ nhiều ngôn ngữ (Tiếng Anh, Tây Ban Nha, Pháp, Đức)
+- 🌍 **Đa ngôn ngữ**: Hỗ trợ tiếng Anh và tiếng Việt
 - 🪝 **Tích hợp Git hooks**: Cài đặt như một git hook để tự động hóa quá trình commit
 - ⚙️ **Cấu hình tùy chỉnh**: Lưu trữ và quản lý cấu hình người dùng
 
@@ -67,8 +67,8 @@ git-commit-genius generate --preview
 # Tạo thông điệp commit theo chuẩn conventional
 git-commit-genius generate --conventional
 
-# Tạo thông điệp commit bằng tiếng Tây Ban Nha
-git-commit-genius generate --language es
+# Tạo thông điệp commit bằng tiếng Việt
+git-commit-genius generate --language vi
 ```
 
 ## Các tùy chọn
@@ -77,12 +77,12 @@ git-commit-genius generate --language es
 
 | Tùy chọn | Mô tả |
 |----------|-------|
-| `-m, --model <model>` | Model Ollama sử dụng để tạo thông điệp (mặc định: llama2) |
+| `-m, --model <model>` | Model Ollama sử dụng để tạo thông điệp (mặc định: llama3) |
 | `-t, --temperature <temperature>` | Nhiệt độ cho quá trình tạo (0.0-1.0) |
 | `-c, --commit` | Tự động commit với thông điệp đã tạo |
 | `-p, --preview` | Chỉ xem trước sự thay đổi mà không tạo thông điệp |
 | `-v, --conventional` | Sử dụng định dạng conventional commit |
-| `-l, --language <language>` | Ngôn ngữ cho thông điệp commit (en, es, fr, de) |
+| `-l, --language <language>` | Ngôn ngữ cho thông điệp commit (en, vi) |
 | `--type <type>` | Loại conventional commit (feat, fix, docs, ...) |
 | `--scope <scope>` | Phạm vi cho conventional commit |
 
@@ -126,7 +126,7 @@ Git Commit Genius được thiết kế để hòa nhập liền mạch vào quy
 - **src/utils/conventional-commits.js**: Xử lý định dạng conventional commits
 - **src/config/config.js**: Quản lý cấu hình người dùng
 - **src/hooks/hook-manager.js**: Quản lý cài đặt/gỡ bỏ Git hooks
-- **src/locales/**: Thư mục chứa các file ngôn ngữ (en.json, es.json, ...)
+- **src/locales/**: Thư mục chứa các file ngôn ngữ (en.json, vi.json)
 
 ## Chi tiết kỹ thuật
 
@@ -173,6 +173,4 @@ File này quản lý hệ thống đa ngôn ngữ:
 - `get(key, args, language)`: Lấy chuỗi đã dịch theo key và ngôn ngữ
 - `getAvailableLanguages()`: Lấy danh sách các ngôn ngữ có sẵn
 
-## Giấy phép
 
-ISC
