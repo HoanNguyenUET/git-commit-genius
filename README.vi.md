@@ -27,7 +27,7 @@ Git Commit Genius là một công cụ dòng lệnh giúp lập trình viên t�
 
 ```bash
 # Clone kho lưu trữ
-git clone https://github.com/yourusername/git-commit-genius.git
+git clone https://github.com/HoanNguyenUET/git-commit-genius.git
 
 # Di chuyển đến thư mục dự án
 cd git-commit-genius

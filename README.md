@@ -26,7 +26,7 @@ Git Commit Genius is a command-line tool that helps developers create meaningful
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/git-commit-genius.git
+git clone https://github.com/HoanNguyenUET/git-commit-genius.git
 
 # Navigate to the project directory
 cd git-commit-genius
